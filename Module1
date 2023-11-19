@@ -1,0 +1,48 @@
+Sub sort_files()
+
+    Dim adr As String
+    Dim adr_1 As String
+    Dim adr_2 As String
+    Dim adr_3 As String
+    Dim objFSO As Object
+    Dim objFolder As Object
+    Dim name_file As String
+    Dim data() As String
+    Dim well As String
+    Dim cluster As String
+    Dim date_measure As String
+    Dim year_measure As String
+    Dim month_measure As String
+        
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    adr = objFSO.GetParentFolderName(Application.GetOpenFilename())
+    Set objFolder = objFSO.getfolder(adr)
+    
+    For Each file In objFolder.Files
+        name_file = file.Name
+        data = Split(name_file, "_")
+        well = data(2)
+        cluster = Split(well, "-")(0)
+        date_measure = data(3)
+        year_measure = Split(date_measure, ".")(2)
+        month_measure = Split(date_measure, ".")(1)
+        adr_1 = adr & "\20" & year_measure
+        adr_2 = adr_1 & "\" & month_measure
+        adr_3 = adr_2 & "\" & cluster
+        
+        If objFSO.FileExists(adr_3 & "\" & name_file) = False Then
+        
+            If objFSO.FolderExists(adr_1) = False Then objFSO.CreateFolder adr_1
+            If objFSO.FolderExists(adr_2) = False Then objFSO.CreateFolder adr_2
+            If objFSO.FolderExists(adr_3) = False Then objFSO.CreateFolder adr_3
+            
+            objFSO.MoveFile adr & "\" & name_file, adr_3 & "\" & name_file
+        
+        Else
+            objFSO.DeleteFile adr & "\" & name_file
+        End If
+    Next
+    
+    MsgBox "Сортировка закончена"
+    
+End Sub
